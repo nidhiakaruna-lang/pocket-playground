@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Pocket Playground – Fun Games for Kids</title>
+<meta name="description" content="Pocket Playground: free, safe games for little learners. Pop balloons, match cards, count critters and copy colors. No ads, no login.">
+<meta name="theme-color" content="#59c9ff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Playground">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --sky1:#4cc3ff; --sky2:#bff0ff; --sun:#ffd23f; --coral:#ff6b6b; --mint:#3ddc97; --blue:#4cc9f0;
+  --grape:#8b6bff; --ink:#2b2d5b; --card:#fffdf5;
+  --display:'Lilita One','Chalkboard SE','Comic Sans MS',system-ui,sans-serif;
+  --body:'Nunito','Trebuchet MS',system-ui,sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none}
+body{
+  font-family:var(--body);color:var(--ink);touch-action:manipulation;
+  background:linear-gradient(180deg,var(--sky1) 0%,var(--sky2) 70%,#e6ffd8 100%);
+}
+button{font-family:inherit;color:inherit;border:0;cursor:pointer}
+/* drifting clouds + hills */
+.cloud{position:fixed;background:#fff;border-radius:99px;opacity:.85;filter:blur(.3px);animation:drift linear infinite;z-index:0}
+.cloud:before,.cloud:after{content:"";position:absolute;background:#fff;border-radius:50%}
+.cloud:before{width:55%;height:160%;left:12%;top:-70%}
+.cloud:after{width:40%;height:130%;right:12%;top:-50%}
+@keyframes drift{from{transform:translateX(-30vw)}to{transform:translateX(130vw)}}
+.hills{position:fixed;left:0;right:0;bottom:0;height:22vh;z-index:0;pointer-events:none;
+  background:
+   radial-gradient(60% 100% at 20% 100%,#6fdc6f 60%,transparent 61%),
+   radial-gradient(70% 120% at 75% 100%,#4fcf7a 60%,transparent 61%);}
+#app{position:relative;z-index:1;height:100dvh;display:flex;flex-direction:column;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+header{display:flex;align-items:center;gap:10px;padding:10px 14px;min-height:64px}
+header h1{font-family:var(--display);font-weight:400;margin:0;font-size:clamp(1.3rem,5vw,2rem);flex:1;text-align:center;
+  color:#fff;-webkit-text-stroke:2px var(--ink);paint-order:stroke fill;letter-spacing:.5px;text-shadow:0 4px 0 rgba(43,45,91,.25)}
+.pill{background:var(--card);border-radius:99px;padding:8px 14px;font-weight:900;font-size:1.1rem;box-shadow:0 4px 0 rgba(43,45,91,.25);border:3px solid var(--ink);min-width:52px;min-height:48px;display:flex;align-items:center;justify-content:center;gap:6px}
+.pill:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(43,45,91,.25)}
+#back{visibility:hidden;font-size:1.4rem}
+#stage{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;padding:0 14px 14px;position:relative}
+.hud{width:100%;max-width:640px;display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+.prompt{font-family:var(--display);font-size:clamp(1.4rem,6vw,2.2rem);background:var(--card);border:4px solid var(--ink);border-radius:24px;padding:8px 20px;box-shadow:0 6px 0 rgba(43,45,91,.25);text-align:center;flex:1}
+.prompt b{color:var(--coral);font-size:1.25em}
+.dots{display:flex;gap:5px;flex-wrap:wrap;justify-content:center;margin:6px 0}
+.dots i{width:16px;height:16px;border-radius:50%;background:rgba(255,255,255,.7);border:3px solid var(--ink);display:block}
+.dots i.on{background:var(--sun);animation:boing .4s}
+@keyframes boing{50%{transform:scale(1.5)}}
+
+/* HOME */
+.home{width:100%;max-width:720px;display:flex;flex-direction:column;align-items:center;gap:14px;overflow-y:auto;padding-bottom:20px}
+.hero{display:flex;align-items:center;gap:12px}
+.mascot{font-size:clamp(3.5rem,16vw,6rem);animation:bob 2s ease-in-out infinite;cursor:pointer}
+@keyframes bob{50%{transform:translateY(-10px) rotate(-5deg)}}
+.bubble{background:var(--card);border:4px solid var(--ink);border-radius:24px;padding:10px 16px;font-family:var(--display);font-size:clamp(1.1rem,4.5vw,1.6rem);position:relative}
+.bubble:before{content:"";position:absolute;left:-16px;top:50%;margin-top:-10px;border:10px solid transparent;border-right-color:var(--ink);border-left:0}
+.games{display:grid;grid-template-columns:1fr 1fr;gap:14px;width:100%}
+.gcard{border-radius:28px;border:4px solid var(--ink);padding:14px 8px 12px;display:flex;flex-direction:column;align-items:center;gap:4px;
+  box-shadow:0 8px 0 rgba(43,45,91,.3);font-family:var(--display);font-size:clamp(1.1rem,4.6vw,1.6rem);color:#fff;
+  -webkit-text-stroke:1.5px var(--ink);paint-order:stroke fill;animation:pop-in .5s backwards;transition:transform .12s}
+.gcard:active{transform:translateY(6px);box-shadow:0 2px 0 rgba(43,45,91,.3)}
+.gcard span.ic{font-size:clamp(2.6rem,12vw,4rem);-webkit-text-stroke:0;filter:drop-shadow(0 4px 0 rgba(43,45,91,.25))}
+.gcard small{font-family:var(--body);font-weight:900;font-size:.62em;-webkit-text-stroke:0;color:var(--ink);opacity:.8}
+.gcard:nth-child(1){background:var(--coral);animation-delay:.05s}
+.gcard:nth-child(2){background:var(--mint);animation-delay:.15s}
+.gcard:nth-child(3){background:#ffb02e;animation-delay:.25s}
+.gcard:nth-child(4){background:var(--grape);animation-delay:.35s}
+@keyframes pop-in{from{transform:scale(.3) rotate(-10deg);opacity:0}}
+.shelf{width:100%;background:rgba(255,253,245,.9);border:4px solid var(--ink);border-radius:24px;padding:10px 12px}
+.shelf h2{margin:0 0 6px;font-family:var(--display);font-weight:400;font-size:1.1rem}
+.stickers{display:grid;grid-template-columns:repeat(8,1fr);gap:4px}
+.stk{aspect-ratio:1;border-radius:14px;background:#eef;display:flex;align-items:center;justify-content:center;font-size:clamp(1.3rem,6vw,2.2rem);background:#f1f4ff;border:2px dashed #b9c1e6}
+.stk.locked{filter:grayscale(1) brightness(1.4);opacity:.55}
+.stk.open{background:#fff7d6;border:2px solid var(--sun);cursor:pointer}
+.stk.open:active{animation:boing .4s}
+.hint{font-size:.85rem;font-weight:900;text-align:center;opacity:.75;margin-top:6px}
+
+/* BALLOONS */
+.sky{position:relative;flex:1;width:100%;max-width:720px;overflow:hidden;border-radius:28px}
+.balloon{position:absolute;bottom:-130px;width:clamp(72px,20vw,96px);height:clamp(88px,24vw,116px);border-radius:50% 50% 47% 47%;
+  font-family:var(--display);font-size:clamp(2rem,9vw,3rem);color:#fff;-webkit-text-stroke:2px rgba(0,0,0,.25);
+  display:flex;align-items:center;justify-content:center;border:3px solid rgba(43,45,91,.7);
+  background:radial-gradient(circle at 30% 28%,rgba(255,255,255,.7) 0 12%,transparent 13%),var(--c);
+  box-shadow:inset -8px -10px 0 rgba(0,0,0,.12);
+  animation:rise var(--t) linear forwards;will-change:transform}
+.balloon:after{content:"";position:absolute;bottom:-30px;left:50%;width:2px;height:28px;background:var(--ink);opacity:.6}
+.balloon span{display:block;animation:sway 1.6s ease-in-out infinite alternate}
+@keyframes rise{to{transform:translateY(-130vh)}}
+@keyframes sway{from{transform:rotate(-6deg)}to{transform:rotate(6deg)}}
+.balloon.pop{animation:none;transform:scale(1.5);opacity:0;transition:transform .2s,opacity .2s;pointer-events:none}
+.balloon.no{animation:rise var(--t) linear forwards,shake .35s}
+
+/* MEMORY */
+.mem{display:grid;grid-template-columns:repeat(var(--cols),1fr);gap:10px;width:min(96vw,calc(60dvh*var(--cols)/var(--rows)),640px);margin:auto 0}
+.card{aspect-ratio:1;perspective:600px;background:none;padding:0}
+.card .in{position:relative;width:100%;height:100%;transition:transform .45s;transform-style:preserve-3d}
+.card.up .in,.card.done .in{transform:rotateY(180deg)}
+.card .f,.card .b{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:20px;border:4px solid var(--ink);display:flex;align-items:center;justify-content:center;box-shadow:0 5px 0 rgba(43,45,91,.3)}
+.card .b{background:repeating-linear-gradient(45deg,var(--grape) 0 10px,#9d82ff 10px 20px);font-size:clamp(1.6rem,8vw,2.6rem);color:#fff}
+.card .f{background:var(--card);transform:rotateY(180deg);font-size:clamp(2rem,11vw,3.6rem)}
+.card.done .f{background:#d9ffe9;border-color:var(--mint);animation:boing .5s}
+
+/* COUNT */
+.count{flex:1;width:100%;max-width:640px;display:flex;flex-direction:column;align-items:center;justify-content:space-around;gap:10px}
+.items{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center;background:rgba(255,253,245,.85);border:4px solid var(--ink);border-radius:28px;padding:16px;width:100%;min-height:34dvh}
+.it{font-size:clamp(2.4rem,11vw,3.8rem);background:none;position:relative;padding:2px;animation:pop-in .4s backwards}
+.it em{position:absolute;right:-4px;top:-8px;background:var(--coral);color:#fff;font-style:normal;font-family:var(--display);font-size:1rem;border-radius:99px;min-width:26px;height:26px;display:flex;align-items:center;justify-content:center;border:2px solid var(--ink)}
+.it:active{transform:scale(1.2)}
+.answers{display:flex;gap:12px;width:100%;justify-content:center}
+.ans{flex:1;max-width:150px;aspect-ratio:1.1;border-radius:28px;font-family:var(--display);font-size:clamp(2.4rem,12vw,3.8rem);color:#fff;-webkit-text-stroke:2px var(--ink);paint-order:stroke fill;border:4px solid var(--ink);box-shadow:0 8px 0 rgba(43,45,91,.3)}
+.ans:nth-child(1){background:var(--coral)}.ans:nth-child(2){background:var(--blue)}.ans:nth-child(3){background:var(--mint)}
+.ans:active{transform:translateY(6px);box-shadow:0 2px 0 rgba(43,45,91,.3)}
+.no{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-10px)}75%{transform:translateX(10px)}}
+
+/* SIMON */
+.simon{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;width:100%}
+.pads{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:min(90vw,52dvh,460px);aspect-ratio:1}
+.pad{border-radius:30px;border:4px solid var(--ink);box-shadow:0 8px 0 rgba(43,45,91,.3);opacity:.78;transition:transform .1s,filter .1s,opacity .1s;font-size:2.4rem}
+.pad.lit{opacity:1;filter:brightness(1.35) saturate(1.2);transform:scale(1.06);box-shadow:0 0 40px 10px rgba(255,255,255,.9)}
+.pad:nth-child(1){background:#ff5d5d}.pad:nth-child(2){background:#ffd23f}.pad:nth-child(3){background:#3ddc97}.pad:nth-child(4){background:#4cc9f0}
+.status{font-family:var(--display);font-size:clamp(1.4rem,6vw,2rem);background:var(--card);border:4px solid var(--ink);border-radius:99px;padding:8px 24px;box-shadow:0 5px 0 rgba(43,45,91,.25)}
+
+/* WIN + FX */
+.win{position:absolute;inset:0;z-index:20;background:rgba(43,45,91,.55);display:flex;align-items:center;justify-content:center;padding:20px;animation:fade .3s}
+@keyframes fade{from{opacity:0}}
+.wcard{background:var(--card);border:5px solid var(--ink);border-radius:36px;padding:24px 22px;text-align:center;max-width:380px;width:100%;animation:pop-in .5s cubic-bezier(.3,1.6,.5,1)}
+.wcard h2{font-family:var(--display);font-weight:400;font-size:2.4rem;margin:0}
+.wcard .st{font-size:3rem;margin:6px 0 14px;letter-spacing:6px}
+.wcard .st s{text-decoration:none;display:inline-block;animation:boing .6s backwards}
+.btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.btn{font-family:var(--display);font-size:1.4rem;color:#fff;background:var(--mint);border:4px solid var(--ink);border-radius:99px;padding:10px 22px;box-shadow:0 6px 0 rgba(43,45,91,.3);-webkit-text-stroke:1px var(--ink);paint-order:stroke fill}
+.btn.alt{background:var(--sun)}
+.btn:active{transform:translateY(5px);box-shadow:0 1px 0 rgba(43,45,91,.3)}
+#fx{position:fixed;inset:0;pointer-events:none;z-index:50;overflow:hidden}
+.conf{position:absolute;width:12px;height:12px;border-radius:3px;animation:conf .9s ease-out forwards}
+@keyframes conf{to{transform:translate(var(--dx),var(--dy)) rotate(var(--r));opacity:0}}
+#toast{position:fixed;left:50%;top:78px;transform:translate(-50%,-200%);z-index:60;background:var(--sun);border:4px solid var(--ink);border-radius:99px;padding:10px 20px;font-family:var(--display);font-size:1.3rem;transition:transform .4s cubic-bezier(.3,1.6,.5,1)}
+#toast.show{transform:translate(-50%,0)}
+@media (prefers-reduced-motion:reduce){.cloud,.mascot{animation:none}}
+</style>
+</head>
+<body>
+<div class="cloud" style="top:9%;width:120px;height:34px;animation-duration:70s"></div>
+<div class="cloud" style="top:24%;width:90px;height:26px;animation-duration:95s;animation-delay:-40s"></div>
+<div class="cloud" style="top:44%;width:150px;height:40px;animation-duration:120s;animation-delay:-80s"></div>
+<div class="hills"></div>
+<div id="app">
+  <header>
+    <button class="pill" id="back" aria-label="Home">🏠</button>
+    <h1 id="title">Pocket Playground</h1>
+    <button class="pill" id="snd" aria-label="Sound">🔊</button>
+    <div class="pill" aria-label="Stars">⭐ <span id="stars">0</span></div>
+  </header>
+  <main id="stage"></main>
+</div>
+<div id="fx"></div>
+<div id="toast"></div>
+
+<script>
+(function(){
+'use strict';
+const $=(s,r=document)=>r.querySelector(s);
+const rnd=n=>Math.floor(Math.random()*n);
+const pick=a=>a[rnd(a.length)];
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]]}return a};
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const store={get(k,d){try{const v=localStorage.getItem(k);return v===null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+
+const STICKERS=['🦄','🚀','🐲','🦖','🌈','🍦','🐬','🎈'];
+const PER_STICKER=5;
+let stars=store.get('stars',0), sound=store.get('sound',true);
+const stage=$('#stage'), title=$('#title'), back=$('#back');
+let teardown=[];
+
+/* ---------- audio ---------- */
+let ac=null;
+function ctx(){ if(!ac){try{ac=new (window.AudioContext||window.webkitAudioContext)()}catch(e){}} if(ac&&ac.state==='suspended')ac.resume(); return ac }
+function tone(f,d=.15,type='sine',at=0,vol=.18,slide){
+  if(!sound)return; const c=ctx(); if(!c)return;
+  const o=c.createOscillator(), g=c.createGain(), t=c.currentTime+at;
+  o.type=type; o.frequency.setValueAtTime(f,t); if(slide)o.frequency.exponentialRampToValueAtTime(slide,t+d);
+  g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(.001,t+d);
+  o.connect(g); g.connect(c.destination); o.start(t); o.stop(t+d+.02);
+}
+const sfx={
+  tap(){tone(500,.06,'triangle')},
+  pop(){tone(300,.12,'square',0,.12,900)},
+  good(){[660,880,1100].forEach((f,i)=>tone(f,.16,'triangle',i*.08))},
+  bad(){tone(300,.25,'sine',0,.15,170)},
+  flip(){tone(420,.05,'triangle')},
+  win(){[523,659,784,1047,784,1047,1319].forEach((f,i)=>tone(f,.22,'triangle',i*.11,.2))}
+};
+function say(t){
+  if(!sound||!('speechSynthesis' in window))return;
+  try{
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(t); u.rate=.88; u.pitch=1.25; u.volume=1;
+    const vs=speechSynthesis.getVoices().filter(v=>/^en/i.test(v.lang));
+    const v=vs.find(v=>/female|samantha|zira|susan|karen|tessa|moira|aria|jenny|google uk english female|google us english/i.test(v.name))||vs[0];
+    if(v)u.voice=v; speechSynthesis.speak(u);
+  }catch(e){}
+}
+if('speechSynthesis' in window){speechSynthesis.getVoices();speechSynthesis.onvoiceschanged=()=>{}}
+
+/* ---------- fx ---------- */
+const COLORS=['#ff6b6b','#ffd23f','#3ddc97','#4cc9f0','#8b6bff','#ff9ff3','#ffa94d'];
+function confetti(x,y,n=22){
+  const fx=$('#fx');
+  for(let i=0;i<n;i++){
+    const c=document.createElement('i'); c.className='conf';
+    const a=Math.random()*Math.PI*2, d=60+Math.random()*130;
+    c.style.cssText=`left:${x}px;top:${y}px;background:${pick(COLORS)};--dx:${Math.cos(a)*d}px;--dy:${Math.sin(a)*d+60}px;--r:${rnd(720)}deg`;
+    fx.appendChild(c); setTimeout(()=>c.remove(),950);
+  }
+}
+function centerBurst(){ const w=innerWidth,h=innerHeight; for(let i=0;i<4;i++)setTimeout(()=>confetti(w*(.2+Math.random()*.6),h*(.25+Math.random()*.3),30),i*180) }
+let toastT; function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2600)}
+function shake(el){el.classList.remove('no');void el.offsetWidth;el.classList.add('no')}
+
+/* ---------- stars & stickers ---------- */
+function paintStars(){ $('#stars').textContent=stars; $('#snd').textContent=sound?'🔊':'🔇' }
+function addStars(n){
+  const before=Math.floor(stars/PER_STICKER); stars+=n; store.set('stars',stars); paintStars();
+  const after=Math.floor(stars/PER_STICKER);
+  if(after>before&&before<STICKERS.length){ setTimeout(()=>{toast('New sticker! '+STICKERS[Math.min(after,STICKERS.length)-1]);say('You won a new sticker!')},1400) }
+}
+function win(msg,n,again,next){
+  addStars(n); sfx.win(); centerBurst(); say(msg);
+  const w=document.createElement('div'); w.className='win';
+  w.innerHTML=`<div class="wcard"><h2>${msg}</h2><div class="st">${[1,2,3].map(i=>`<s style="animation-delay:${i*.2}s;opacity:${i<=n?1:.25}">⭐</s>`).join('')}</div>
+  <div class="btns"><button class="btn alt" data-a="again">Again</button>${next?'<button class="btn" data-a="next">Next ➜</button>':''}<button class="btn" style="background:var(--blue)" data-a="home">Home</button></div></div>`;
+  w.addEventListener('click',e=>{const a=e.target.dataset.a; if(!a)return; sfx.tap(); if(a==='again')again(); else if(a==='next')next(); else home()});
+  stage.appendChild(w);
+}
+
+/* ---------- navigation ---------- */
+function go(name,label,fn){ teardown.forEach(f=>{try{f()}catch(e){}}); teardown=[]; stage.innerHTML=''; $('#fx').innerHTML=''; title.textContent=label; back.style.visibility=name==='home'?'hidden':'visible'; try{speechSynthesis.cancel()}catch(e){} fn() }
+function home(){ go('home','Pocket Playground',renderHome) }
+back.onclick=()=>{sfx.tap();home()};
+$('#snd').onclick=()=>{sound=!sound;store.set('sound',sound);paintStars();if(sound){ctx();sfx.good()}};
+
+function renderHome(){
+  const got=Math.min(Math.floor(stars/PER_STICKER),STICKERS.length);
+  const left=PER_STICKER-(stars%PER_STICKER);
+  stage.innerHTML=`<div class="home">
+    <div class="hero"><div class="mascot" id="mas">🦊</div><div class="bubble">Hi friend! Let's play!</div></div>
+    <div class="games">
+      <button class="gcard" data-g="balloon"><span class="ic">🎈</span>Balloon Pop<small>letters &amp; numbers</small></button>
+      <button class="gcard" data-g="memory"><span class="ic">🧩</span>Memory Match<small>find the pairs</small></button>
+      <button class="gcard" data-g="count"><span class="ic">🐥</span>Count Fun<small>how many?</small></button>
+      <button class="gcard" data-g="simon"><span class="ic">🎵</span>Copy Colors<small>watch &amp; repeat</small></button>
+    </div>
+    <div class="shelf"><h2>⭐ My Stickers (${got}/${STICKERS.length})</h2>
+      <div class="stickers">${STICKERS.map((s,i)=>`<div class="stk ${i<got?'open':'locked'}" data-s="${i}">${i<got?s:'❓'}</div>`).join('')}</div>
+      <div class="hint">${got>=STICKERS.length?'You got every sticker! Amazing!':`${left} more ⭐ for the next sticker`}</div></div>
+  </div>`;
+  stage.onclick=null;
+  $('.games').addEventListener('click',e=>{const b=e.target.closest('.gcard'); if(!b)return; ctx(); sfx.tap(); ({balloon,memory,count,simon})[b.dataset.g]()});
+  $('#mas').onclick=()=>{ctx();sfx.good();say(pick(['Hello!','Let us play!','You are so smart!','High five!']))};
+  $('.stickers').addEventListener('click',e=>{const s=e.target.closest('.stk.open'); if(!s)return; sfx.good(); confetti(e.clientX,e.clientY,14); say('Yay!')});
+}
+
+/* ---------- GAME 1: Balloon Pop ---------- */
+function balloon(){
+  go('balloon','Balloon Pop',()=>{
+    const GOAL=8, letters='ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split(''), nums='123456789'.split('');
+    let mode=pick(['letters','numbers']), pool=mode==='letters'?letters:nums, got=0, target, alive=true, ended=false;
+    stage.innerHTML=`<div class="hud"><div class="prompt" id="pr"></div></div><div class="dots" id="dots">${'<i></i>'.repeat(GOAL)}</div><div class="sky" id="sky"></div>`;
+    const sky=$('#sky');
+    function newTarget(){ let t; do{t=pick(pool)}while(t===target); target=t; $('#pr').innerHTML=`Pop the ${mode==='letters'?'letter':'number'} <b>${target}</b>`; say(`Pop the ${mode==='letters'?'letter':'number'} ${target}`) }
+    function spawn(){
+      if(!alive||ended)return;
+      const ch=Math.random()<.45?target:pick(pool);
+      const b=document.createElement('button'); b.className='balloon'; b.innerHTML=`<span>${ch}</span>`;
+      b.style.left=(4+Math.random()*72)+'%'; b.style.setProperty('--c',pick(['#ff6b6b','#ffa94d','#3ddc97','#4cc9f0','#8b6bff','#ff6bb5']));
+      b.style.setProperty('--t',(6.5+Math.random()*3.5)+'s');
+      b.addEventListener('animationend',e=>{ if(e.animationName==='rise')b.remove() });
+      b.addEventListener('pointerdown',e=>{
+        e.preventDefault(); ctx();
+        if(ended||b.classList.contains('pop'))return;
+        if(ch===target){
+          b.classList.add('pop'); sfx.pop(); confetti(e.clientX,e.clientY,18); setTimeout(()=>b.remove(),250);
+          $('#dots').children[got].classList.add('on'); got++;
+          if(got>=GOAL){ ended=true; sky.innerHTML=''; setTimeout(()=>win('Super Popper!',3,balloon),400) } else { sfx.good(); newTarget(); sky.querySelectorAll('.balloon').forEach(x=>{}) }
+        } else { sfx.bad(); b.classList.remove('no'); void b.offsetWidth; b.classList.add('no'); say(`That is ${ch}. Try again`) }
+      });
+      sky.appendChild(b);
+    }
+    newTarget(); spawn(); const iv=setInterval(spawn,820);
+    teardown.push(()=>{alive=false;clearInterval(iv)});
+  });
+}
+
+/* ---------- GAME 2: Memory Match ---------- */
+const ANIMALS=['🐶','🐱','🐰','🐻','🐼','🦁','🐸','🐵','🐧','🦄','🐙','🐢'];
+function memory(level=0){
+  const LV=[{p:4,c:4,r:2},{p:6,c:4,r:3},{p:8,c:4,r:4}][level];
+  go('memory','Memory Match',()=>{
+    stage.innerHTML=`<div class="hud"><div class="prompt" id="pr">Find the pairs!</div></div><div class="mem" style="--cols:${LV.c};--rows:${LV.r}" id="grid"></div>`;
+    say('Find the matching pairs!');
+    const faces=shuffle(ANIMALS).slice(0,LV.p), deck=shuffle([...faces,...faces]);
+    const grid=$('#grid'); let open=[], lock=false, found=0, moves=0;
+    deck.forEach((f,i)=>{
+      const c=document.createElement('button'); c.className='card'; c.setAttribute('aria-label','card');
+      c.innerHTML=`<div class="in"><div class="b">?</div><div class="f">${f}</div></div>`; c.dataset.f=f;
+      c.onclick=async()=>{
+        ctx(); if(lock||c.classList.contains('up')||c.classList.contains('done'))return;
+        c.classList.add('up'); sfx.flip(); open.push(c);
+        if(open.length===2){
+          lock=true; moves++; const [a,b]=open;
+          if(a.dataset.f===b.dataset.f){
+            await sleep(450); a.classList.replace('up','done'); b.classList.replace('up','done'); sfx.good(); const r=b.getBoundingClientRect(); confetti(r.left+r.width/2,r.top+r.height/2,14); found++;
+            open=[]; lock=false;
+            if(found===LV.p){ const s=moves<=LV.p+2?3:moves<=LV.p*2?2:1; setTimeout(()=>win(level<2?'You did it!':'Memory Master!',s,()=>memory(level),level<2?()=>memory(level+1):null),600) }
+          } else { await sleep(900); a.classList.remove('up'); b.classList.remove('up'); sfx.bad(); open=[]; lock=false }
+        }
+      };
+      grid.appendChild(c);
+    });
+  });
+}
+
+/* ---------- GAME 3: Count Fun ---------- */
+function count(){
+  go('count','Count Fun',()=>{
+    const ROUNDS=6, EM=['🍎','🐥','🌟','🐠','🚗','🍓','🐞','🎈','🍪']; let round=0, correct=0;
+    function next(){
+      if(round>=ROUNDS){ return win('Counting Star!',correct>=ROUNDS?3:correct>=ROUNDS-2?2:1,count) }
+      round++; let tries=0, counted=0;
+      const n=1+rnd(round<3?5:10), e=pick(EM);
+      let opts=new Set([n]); while(opts.size<3){const d=Math.max(1,Math.min(10,n+pick([-2,-1,1,2])));opts.add(d)}
+      opts=shuffle([...opts]);
+      stage.innerHTML=`<div class="count"><div class="hud" style="margin:0"><div class="prompt">How many? <small style="font-size:.5em;display:block;opacity:.7">tap to count</small></div></div>
+        <div class="items">${Array.from({length:n},(_,i)=>`<button class="it" style="animation-delay:${i*.07}s">${e}</button>`).join('')}</div>
+        <div class="answers">${opts.map(o=>`<button class="ans" data-n="${o}">${o}</button>`).join('')}</div>
+        <div class="dots">${Array.from({length:ROUNDS},(_,i)=>`<i class="${i<round-1?'on':''}"></i>`).join('')}</div></div>`;
+      if(round===1)say('How many do you see?');
+      $('.items').addEventListener('click',ev=>{ const it=ev.target.closest('.it'); if(!it||it.querySelector('em'))return; ctx(); counted++; it.insertAdjacentHTML('beforeend',`<em>${counted}</em>`); tone(380+counted*50,.12,'triangle'); say(String(counted)) });
+      $('.answers').addEventListener('click',async ev=>{
+        const b=ev.target.closest('.ans'); if(!b)return; ctx();
+        if(+b.dataset.n===n){ sfx.good(); const r=b.getBoundingClientRect(); confetti(r.left+r.width/2,r.top,20); if(!tries)correct++; say(`${n}! Great job!`); $('.answers').style.pointerEvents='none'; await sleep(1300); next() }
+        else { tries++; sfx.bad(); shake(b); b.style.opacity=.35; b.style.pointerEvents='none'; say('Try counting again') }
+      });
+    }
+    next();
+  });
+}
+
+/* ---------- GAME 4: Copy Colors ---------- */
+function simon(){
+  go('simon','Copy Colors',()=>{
+    const GOAL=6, FREQ=[262,330,392,523], NAME=['red','yellow','green','blue']; let alive=true, seq=[], inp=0, busy=true;
+    teardown.push(()=>{alive=false});
+    stage.innerHTML=`<div class="simon"><div class="status" id="st">Watch!</div><div class="pads">${[0,1,2,3].map(i=>`<button class="pad" data-i="${i}" aria-label="${NAME[i]}"></button>`).join('')}</div><div class="dots">${'<i></i>'.repeat(GOAL)}</div></div>`;
+    const pads=[...stage.querySelectorAll('.pad')], st=$('#st'), dots=[...stage.querySelectorAll('.dots i')];
+    async function flash(i,ms=520){ pads[i].classList.add('lit'); tone(FREQ[i],ms/1000,'triangle',0,.25); await sleep(ms); pads[i].classList.remove('lit'); await sleep(160) }
+    async function play(){ busy=true; st.textContent='Watch!'; await sleep(800); for(const i of seq){ if(!alive)return; await flash(i) } if(!alive)return; st.textContent='Your turn!'; say('Your turn'); inp=0; busy=false }
+    function extend(){ seq.push(rnd(4)); play() }
+    pads.forEach((p,i)=>p.addEventListener('pointerdown',async e=>{
+      e.preventDefault(); ctx(); if(busy)return;
+      p.classList.add('lit'); tone(FREQ[i],.3,'triangle',0,.25); setTimeout(()=>p.classList.remove('lit'),240);
+      if(i===seq[inp]){
+        inp++;
+        if(inp===seq.length){
+          busy=true; dots[seq.length-1].classList.add('on'); sfx.good(); st.textContent='Yay!';
+          if(seq.length>=GOAL){ setTimeout(()=>win('Color Champ!',3,simon),500) }
+          else { await sleep(900); if(alive)extend() }
+        }
+      } else { busy=true; sfx.bad(); shake(p); st.textContent='Oops! Watch again'; say('Oops, watch again'); await sleep(1100); if(alive)play() }
+    }));
+    say('Watch the colors, then copy me!'); setTimeout(()=>{if(alive)extend()},300);
+  });
+}
+
+/* ---------- boot ---------- */
+paintStars(); home();
+document.addEventListener('contextmenu',e=>e.preventDefault());
+if('serviceWorker' in navigator){ addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{})) }
+})();
+</script>
+</body>
+</html>

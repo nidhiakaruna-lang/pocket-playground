@@ -1,0 +1,14 @@
+{
+  "name": "Pocket Playground",
+  "short_name": "Playground",
+  "description": "Free, safe games for little learners. No ads, no login.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#bff0ff",
+  "theme_color": "#59c9ff",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
